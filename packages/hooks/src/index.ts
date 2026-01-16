@@ -1,4 +1,1 @@
-export function add() {
-  return 1;
-}
-add();
+export * from './useBoolean';
