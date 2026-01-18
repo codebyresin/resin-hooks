@@ -1,40 +1,29 @@
 ---
-title: 首页
+title: Resin Hooks
 hero:
   title: Resin Hooks
   description: 实用的 React 业务 Hooks 库
   image:
-    src: /logo.png
+    src: /images/logo.png
+    alt: Resin Hooks Logo
   actions:
-    - text: 指南
+    - text: 快速开始
       link: /guide
-    - text: Hooks 列表
+      type: primary
+    - text: 查看 Hooks
       link: /hooks
-footer: Copyright (c) © 2026 by Resin Team, All Rights Reserved
+      type: default
+features:
+  - title: 📦 开箱即用
+    description: 无需配置，直接使用，节省开发时间
+  - title: 🎯 类型安全
+    description: 完整的 TypeScript 类型定义，提供良好的开发体验
+  - title: 🚀 性能优化
+    description: 精心设计的实现，确保最佳性能
+  - title: 📖 详细文档
+    description: 每个 Hook 都有详细的使用示例和说明
+  - title: 🔧 灵活配置
+    description: 支持各种使用场景的配置选项
+  - title: 🎨 易于扩展
+    description: 基于 React Hooks 标准，易于理解和扩展
 ---
-
-## ✨ 特性
-
-- 可靠的代码健壮：使用 Typescript 构建，提供完善的类型定义文件
-- 完善的文档能力：支持文档记录，支持 demo 演示
-- 完整的测试用例：配套完整的测试用例，帮助您提升项目健壮性
-
-## 🖼️ 项目展示
-
-## 📦 安装
-
-```bash
-$ pnpm install --save @resin-hooks/core
-# or
-$ yarn add @resin-hooks/core
-# or
-$ npm install --save @resin-hooks/core
-```
-
-## 🔨 使用
-
-参考 `Hooks` 内容，使用如下：
-
-```ts
-import { useBoolean } from '@resin-hooks/core';
-```

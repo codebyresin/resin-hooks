@@ -11,7 +11,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "resinHooks": ["./packages/hooks/src/index.ts"]
+      "resinHooks": ["./packages/hooks/src/index.ts"],
+      "config/*": ["config/*"]
     },
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
