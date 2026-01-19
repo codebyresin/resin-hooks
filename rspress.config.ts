@@ -5,14 +5,14 @@ export default defineConfig({
   // 基础配置
   title: 'Resin Hooks',
   description: '实用的 React 业务 Hooks 库，提供了一系列常用的 React Hooks',
-  icon: '/images/logo.png',
-  logo: '/images/logo.png',
-
+  icon: '/images/logo.jpg',
+  logo: '/images/logo.jpg',
+  root: 'docs',
   // 部署基础路径
   base: '/resin-hooks/',
 
   // 输出目录
-  outDir: 'rspress-dist',
+  outDir: 'docs/dist',
 
   // 语言配置
   lang: 'zh-CN',
