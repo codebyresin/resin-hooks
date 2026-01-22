@@ -18,7 +18,7 @@ pnpm add @resin-hooks/core
 import { useBoolean } from '@resin-hooks/core';
 
 function App() {
-  const [value, { setTrue, setFalse, toggle }] = useBoolean(false);
+  const [value, { setTrue, setFalse, toggle, set }] = useBoolean(false);
 
   return (
     <div>
@@ -26,6 +26,7 @@ function App() {
       <button onClick={setTrue}>Set True</button>
       <button onClick={setFalse}>Set False</button>
       <button onClick={toggle}>Toggle</button>
+      <button onClick={() => set(true)}>Set via set()</button>
     </div>
   );
 }

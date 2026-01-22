@@ -9,7 +9,7 @@
 #### 基本信息
 
 - **引入**：`import { useBoolean } from '@resin-hooks/core';`
-- **类型**：`useBoolean(initialValue?: boolean): [boolean, (value: boolean) => void, () => void]`
+- **类型**：`useBoolean(initialValue?: boolean): [boolean, UseBooleanActions]`
 
 #### 参数
 
@@ -22,8 +22,11 @@
 返回一个元组，包含：
 
 1. **value** (`boolean`): 当前的布尔值
-2. **setValue** (`(value: boolean) => void`): 设置布尔值的函数
-3. **toggle** (`() => void`): 切换布尔值的函数
+2. **actions** (`UseBooleanActions`): 操作方法的对象，包含：
+   - `setTrue()`: 设置为 `true`
+   - `setFalse()`: 设置为 `false`
+   - `set(value: boolean)`: 设置任意布尔值
+   - `toggle()`: 切换布尔值
 
 #### 使用示例
 
@@ -31,14 +34,15 @@
 import { useBoolean } from '@resin-hooks/core';
 
 function App() {
-  const [value, setValue, toggle] = useBoolean(false);
+  const [value, { setTrue, setFalse, toggle, set }] = useBoolean(false);
 
   return (
     <div>
       <p>Value: {value.toString()}</p>
-      <button onClick={() => setValue(true)}>Set True</button>
-      <button onClick={() => setValue(false)}>Set False</button>
+      <button onClick={setTrue}>Set True</button>
+      <button onClick={setFalse}>Set False</button>
       <button onClick={toggle}>Toggle</button>
+      <button onClick={() => set(true)}>Set via set()</button>
     </div>
   );
 }
