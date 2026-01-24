@@ -27,7 +27,6 @@ describe('useBoolean', () => {
       act(() => {
         result.current[1].setTrue();
       });
-
       expect(result.current[0]).toBe(true);
     });
 
