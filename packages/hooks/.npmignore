@@ -1,0 +1,37 @@
+# Source files
+src/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Config files
+tsconfig.json
+rollup.config.ts
+.eslintrc*
+.prettierrc*
+jest.config.*
+
+# Development files
+node_modules/
+.vscode/
+.idea/
+*.log
+.DS_Store
+
+# Build artifacts (keep dist/)
+*.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+
+# Documentation (keep README.md)
+docs/
+*.md
+!README.md
+
+# Other
+coverage/
+.nyc_output/

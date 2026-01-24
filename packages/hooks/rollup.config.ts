@@ -1,15 +1,14 @@
 import { defineConfig } from 'rollup';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import alias from '@rollup/plugin-alias';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
-import resolve from '@rollup/plugin-node-resolve'; // 修正拼写
+import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import postcss from 'rollup-plugin-postcss';
+import terser from '@rollup/plugin-terser';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// 获取配置文件所在目录（使用 process.cwd() 获取当前工作目录，通常是 packages/hooks）
+const __dirname = process.cwd();
 
 export default defineConfig({
   input: 'src/index.ts',
@@ -34,12 +33,22 @@ export default defineConfig({
     commonjs(),
     del({ targets: ['dist'] }),
     alias({
-      entries: [{ find: '@', replacement: path.resolve(__dirname, './src') }],
+      entries: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
     }),
     typescript({
-      tsconfig: path.resolve(__dirname, './tsconfig.json'),
+      tsconfig: path.resolve(__dirname, 'tsconfig.json'),
       declaration: true,
-      declarationDir: path.resolve(__dirname, './dist/types'),
+      declarationDir: path.resolve(__dirname, 'dist/types'),
+    }),
+    // 代码压缩
+    terser({
+      compress: {
+        drop_console: false, // 保留 console，可根据需要设置为 true 移除
+        drop_debugger: true, // 移除 debugger
+      },
+      format: {
+        comments: false, // 移除注释
+      },
     }),
   ],
 });
