@@ -1,5 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 
+/**
+ * @setTrue设为true
+ * @setFalse设为false
+ * @toggle取反
+ * @set需要传值设置
+ */
 export interface UseBooleanActions {
   setTrue: () => void;
   setFalse: () => void;

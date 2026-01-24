@@ -14,6 +14,7 @@
       "resinHooks": ["./packages/hooks/src/index.ts"],
       "config/*": ["config/*"]
     },
+
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

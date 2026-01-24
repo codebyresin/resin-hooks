@@ -21,6 +21,8 @@ export default defineConfig({
   search: {
     versioned: false,
     codeBlocks: true,
+    // 启用搜索功能（默认已启用，显式声明确保可用）
+    mode: 'local',
   },
 
   // 路由配置
