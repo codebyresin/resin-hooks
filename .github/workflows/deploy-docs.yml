@@ -42,6 +42,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Clean .rspress/components directory
+        run: rm -rf docs/.rspress/components || true
+
       - name: Build docs
         run: pnpm rspress:build
 
