@@ -145,6 +145,9 @@ export default defineConfig({
   // 插件配置
   plugins: [],
 
+  // 全局 UI 组件（已禁用）
+  globalUIComponents: [],
+
   // 全局样式
   // globalStyles: path.resolve(__dirname, 'docs/styles/global.css'),
 
