@@ -28,7 +28,7 @@ export default defineConfig({
   // 路由配置
   route: {
     include: ['**/*.{md,mdx}'],
-    exclude: ['node_modules/**'],
+    exclude: ['node_modules/**', '**/.rspress/components/**'],
     cleanUrls: true,
   },
 
@@ -138,6 +138,10 @@ export default defineConfig({
       // 可以在这里配置 Rspack 相关选项
       rspack: {
         // Rspack 配置
+        resolve: {
+          // 排除 .rspress/components 目录，避免自动扫描
+          extensions: ['.tsx', '.ts', '.jsx', '.js'],
+        },
       },
     },
   },
