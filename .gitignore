@@ -19,4 +19,10 @@ yarn-error.log
 package-lock.json
 metadata.json
 .eslintcache
-docs/.rspress
+docs/.rspress/*
+!docs/.rspress/components
+docs/.rspress/components/*
+!docs/.rspress/components/Playground.tsx/*
+!docs/.rspress/components
+docs/.rspress/components/*
+!docs/.rspress/components/Playground.tsx
