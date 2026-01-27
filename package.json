@@ -13,7 +13,7 @@
     "prepare": "husky install",
     "docs:dev": "dumi dev",
     "rspress:dev": "rspress dev",
-    "rspress:build": "pnpm play:build && node scripts/clean-rspress.js && rspress build",
+    "rspress:build": "pnpm play:build && rspress build",
     "rspress:preview": "rspress preview",
     "play:dev": "pnpm --filter @resin-hooks/play dev",
     "play:build": "pnpm --filter @resin-hooks/play build",
