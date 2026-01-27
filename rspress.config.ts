@@ -56,7 +56,22 @@ export default defineConfig({
       '/hooks': [
         {
           text: 'Hooks',
-          items: [{ text: '概览', link: '/hooks' }],
+          items: [
+            { text: '概览', link: '/hooks' },
+            {
+              text: '状态管理',
+              items: [
+                { text: 'useBoolean', link: '/hooks/useBoolean' },
+                { text: 'useLatest', link: '/hooks/useLatest' },
+              ],
+            },
+            {
+              text: '性能优化',
+              items: [
+                { text: 'useVirtualList', link: '/hooks/useVirtualList' },
+              ],
+            },
+          ],
         },
       ],
     },
@@ -130,10 +145,10 @@ export default defineConfig({
   // 插件配置
   plugins: [],
 
-  // 全局 UI 组件（如果需要）
-  // globalUIComponents: [
-  //   path.resolve(__dirname, 'docs/.rspress/components/HomeFooter.tsx'),
-  // ],
+  // 全局 UI 组件
+  globalUIComponents: [
+    path.resolve(__dirname, 'docs/.rspress/components/Playground.tsx'),
+  ],
 
   // 全局样式
   // globalStyles: path.resolve(__dirname, 'docs/styles/global.css'),
