@@ -2,14 +2,20 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import UseBooleanDemo from './demos/UseBooleanDemo';
 import UseLatestDemo from './demos/UseLatestDemo';
+import UseSyncScrollDemo from './demos/UseSyncScrollDemo';
 import UseVirtualListDemo from './demos/UseVirtualListDemo';
 
-type DemoType = 'useBoolean' | 'useLatest' | 'useVirtualList';
+type DemoType = 'useBoolean' | 'useLatest' | 'useSyncScroll' | 'useVirtualList';
 
 const demos: { key: DemoType; name: string; component: React.ComponentType }[] =
   [
     { key: 'useBoolean', name: 'useBoolean', component: UseBooleanDemo },
     { key: 'useLatest', name: 'useLatest', component: UseLatestDemo },
+    {
+      key: 'useSyncScroll',
+      name: 'useSyncScroll',
+      component: UseSyncScrollDemo,
+    },
     {
       key: 'useVirtualList',
       name: 'useVirtualList',

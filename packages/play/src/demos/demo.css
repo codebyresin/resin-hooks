@@ -158,3 +158,146 @@
 .demo-code code {
   font-family: 'Courier New', monospace;
 }
+
+/* useSyncScroll demo */
+.sync-scroll-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sync-scroll-panel {
+  flex: 1;
+  min-width: 200px;
+}
+
+.sync-scroll-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sync-scroll-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.sync-scroll-box p {
+  margin: 0.5rem 0;
+  color: #4b5563;
+}
+
+/* 商品分类 + 商品内容布局 */
+.sync-scroll-shop {
+  align-items: stretch;
+}
+
+.sync-scroll-categories {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.sync-scroll-content {
+  flex: 1;
+  min-width: 280px;
+}
+
+.sync-scroll-category-list .sync-scroll-inner,
+.sync-scroll-product-list .sync-scroll-inner {
+  padding: 0.5rem 0;
+}
+
+.category-item {
+  padding: 0.65rem 1rem;
+  margin: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: default;
+  transition: background 0.2s;
+}
+
+.category-item:hover {
+  background: #f3f4f6;
+}
+
+/* 左侧分类当前项高亮 */
+.category-item--active {
+  background: #e0e7ff !important;
+  color: #4338ca;
+  font-weight: 600;
+  border-left: 3px solid #6366f1;
+}
+
+.category-item--active:hover {
+  background: #c7d2fe !important;
+}
+
+.sync-scroll-products-inner {
+  padding: 0.75rem !important;
+}
+
+/* 右侧按分类分块：区块垂直排列 */
+.sync-scroll-products-inner.sync-scroll-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.content-section {
+  display: block;
+}
+
+.content-section__title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #374151;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.product-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.product-card__thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.product-card__name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.product-card__price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #dc2626;
+  margin-bottom: 0.25rem;
+}
+
+.product-card__tag {
+  font-size: 0.7rem;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
