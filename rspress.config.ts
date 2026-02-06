@@ -68,6 +68,7 @@ export default defineConfig({
             {
               text: '性能优化',
               items: [
+                { text: 'useThrottle', link: '/hooks/useThrottle' },
                 { text: 'useVirtualList', link: '/hooks/useVirtualList' },
               ],
             },

@@ -11,6 +11,7 @@ Resin Hooks 提供了一系列实用的 React Hooks，帮助开发者更高效�
 
 ### 性能优化
 
+- [useThrottle](/hooks/useThrottle) - 节流，限制函数执行频率
 - [useVirtualList](/hooks/useVirtualList) - 虚拟列表，高效渲染大量数据
 
 ## 快速开始
@@ -28,7 +29,12 @@ yarn add @resin-hooks/core
 ### 使用
 
 ```tsx
-import { useBoolean, useLatest, useVirtualList } from '@resin-hooks/core';
+import {
+  useBoolean,
+  useLatest,
+  useThrottle,
+  useVirtualList,
+} from '@resin-hooks/core';
 
 function App() {
   // 使用 useBoolean
@@ -36,6 +42,11 @@ function App() {
 
   // 使用 useLatest
   const latestValue = useLatest(value);
+
+  // 使用 useThrottle
+  const { throttleFn, cancel } = useThrottle((val) => console.log(val), {
+    interval: 500,
+  });
 
   // 使用 useVirtualList
   const { list, containerProps, totalHeight } = useVirtualList(data, {
@@ -72,6 +83,19 @@ function App() {
 - 不影响渲染性能
 
 [查看完整文档 →](/hooks/useLatest)
+
+### useThrottle
+
+用于限制函数执行频率的 Hook，支持 leading、trailing 配置。
+
+**特性：**
+
+- 可配置 interval、leading、trailing
+- 支持 resultCallback 获取执行结果
+- 提供 cancel 取消未执行的 trailing
+- 组件卸载时自动清理定时器
+
+[查看完整文档 →](/hooks/useThrottle)
 
 ### useVirtualList
 
