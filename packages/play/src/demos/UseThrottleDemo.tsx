@@ -1,27 +1,43 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useThrottle } from '@resin-hooks/core';
 import './demo.css';
 
 export default function UseThrottleDemo() {
   const [value, setValue] = useState('');
   const [throttledValue, setThrottledValue] = useState('');
+  const [execCount, setExecCount] = useState(0);
 
-  // Default options
-  const [wait, setWait] = useState(1000);
+  const [interval, setInterval] = useState(500);
   const [leading, setLeading] = useState(true);
   const [trailing, setTrailing] = useState(true);
 
-  const throttledSetter = useThrottle(
+  const handleResult = useCallback(() => {
+    setExecCount((c) => c + 1);
+  }, []);
+
+  const { throttleFn, cancel } = useThrottle(
     (val: string) => {
       setThrottledValue(val);
     },
-    { wait, leading, trailing },
+    {
+      interval,
+      leading,
+      trailing,
+      resultCallback: handleResult,
+    },
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setValue(val);
-    throttledSetter(val);
+    throttleFn(val);
+  };
+
+  const handleReset = () => {
+    setValue('');
+    setThrottledValue('');
+    setExecCount(0);
+    cancel();
   };
 
   return (
@@ -29,115 +45,96 @@ export default function UseThrottleDemo() {
       <h2>useThrottle Demo</h2>
       <p className="demo-description">
         useThrottle
-        用于限制函数执行的频率。在下面的输入框中输入内容，观察节流后的更新效果。
+        用于限制函数执行频率。在输入框中快速输入，观察「实时值」与「节流后的值」的差异；可调节
+        interval、leading、trailing 查看不同效果。
       </p>
 
       <div className="demo-section">
-        <div className="demo-controls" style={{ marginBottom: '20px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label>Wait (ms): </label>
-            <input
-              type="number"
-              value={wait}
-              onChange={(e) => setWait(Number(e.target.value))}
-              style={{ padding: '4px', width: '80px' }}
-            />
-          </div>
-          <div style={{ display: 'flex', gap: '15px' }}>
+        <div className="demo-controls">
+          <div className="throttle-control-row">
             <label>
+              间隔 (ms):
+              <input
+                type="number"
+                min={100}
+                max={3000}
+                step={100}
+                value={interval}
+                onChange={(e) => setInterval(Number(e.target.value) || 500)}
+                className="throttle-input"
+              />
+            </label>
+            <label className="throttle-checkbox">
               <input
                 type="checkbox"
                 checked={leading}
                 onChange={(e) => setLeading(e.target.checked)}
-              />{' '}
-              Leading
+              />
+              leading（首次立即执行）
             </label>
-            <label>
+            <label className="throttle-checkbox">
               <input
                 type="checkbox"
                 checked={trailing}
                 onChange={(e) => setTrailing(e.target.checked)}
-              />{' '}
-              Trailing
+              />
+              trailing（间隔末补执行）
             </label>
           </div>
         </div>
 
-        <div className="demo-input-area" style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            value={value}
-            onChange={handleChange}
-            placeholder="Type quickly..."
-            className="demo-input"
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '16px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-        </div>
-
-        <div className="demo-value">
-          <div style={{ marginBottom: '10px' }}>
-            <strong>Real-time Value:</strong>
-            <div
-              className="value-box"
-              style={{
-                padding: '10px',
-                background: '#f5f5f5',
-                marginTop: '5px',
-              }}
+        <div className="demo-value" style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: '0.5rem' }}>
+            <strong>实时值：</strong>
+            <span
+              className="value-badge"
+              style={{ background: '#e5e7eb', color: '#374151' }}
             >
-              {value || '(empty)'}
-            </div>
+              {value || '(空)'}
+            </span>
           </div>
-          <div>
-            <strong>Throttled Value:</strong>
-            <div
-              className="value-box"
-              style={{
-                padding: '10px',
-                background: '#e6f7ff',
-                marginTop: '5px',
-                border: '1px solid #91d5ff',
-              }}
-            >
-              {throttledValue || '(empty)'}
-            </div>
+          <div style={{ marginBottom: '0.5rem' }}>
+            <strong>节流后的值：</strong>
+            <span className="value-badge true">{throttledValue || '(空)'}</span>
+          </div>
+          <div style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+            fn 执行次数：<strong>{execCount}</strong>
           </div>
         </div>
 
-        <div className="demo-buttons" style={{ marginTop: '20px' }}>
-          <button
-            onClick={() => throttledSetter.cancel()}
-            className="btn btn-secondary"
-          >
-            Cancel
+        <input
+          type="text"
+          value={value}
+          onChange={handleChange}
+          placeholder="快速输入以观察节流效果..."
+          className="throttle-input throttle-input-full"
+        />
+
+        <div className="demo-buttons" style={{ marginTop: '1rem' }}>
+          <button onClick={cancel} className="btn btn-secondary">
+            取消未执行的 trailing
           </button>
-          <button
-            onClick={() => throttledSetter.flush()}
-            className="btn btn-primary"
-          >
-            Flush
+          <button onClick={handleReset} className="btn btn-accent">
+            重置
           </button>
         </div>
       </div>
 
       <div className="demo-code">
-        <h3>使用示例:</h3>
+        <h3>使用示例</h3>
         <pre>
-          <code>{`const [value, setValue] = useState('');
-const throttledSetter = useThrottle(
-  (val) => setValue(val),
-  { wait: ${wait}, leading: ${leading}, trailing: ${trailing} }
+          <code>{`const { throttleFn, cancel } = useThrottle(
+  (val) => setThrottledValue(val),
+  {
+    interval: ${interval},
+    leading: ${leading},
+    trailing: ${trailing},
+    resultCallback: (res) => console.log('执行结果', res),
+  }
 );
 
-<input 
-  onChange={(e) => throttledSetter(e.target.value)} 
-/>`}</code>
+<input onChange={(e) => throttleFn(e.target.value)} />
+<button onClick={cancel}>取消</button>`}</code>
         </pre>
       </div>
     </div>
