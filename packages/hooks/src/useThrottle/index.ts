@@ -1,115 +1,120 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
+
+/**
+ * useThrottle
+ * @param fn 需要节流的函数
+ * @param options 配置项
+ */
 
 export interface UseThrottleOptions {
-  wait?: number;
-  leading?: boolean;
-  trailing?: boolean;
+  interval?: number; // 间隔时间
+  leading?: boolean; // 是否第一次立即执行
+  trailing?: boolean; // 是否在最后一次补执行
+  resultCallback?: (res: any) => void; // fn 执行结果回调
 }
 
-type ThrottledFn<T extends (...args: any[]) => any> = ((
+type throttleFn<T extends (...args: any[]) => any> = (
   ...args: Parameters<T>
-) => ReturnType<T> | undefined) & {
-  cancel: () => void;
-  flush: () => ReturnType<T> | undefined;
-};
+) => ReturnType<T> | undefined;
 
 export function useThrottle<T extends (...args: any[]) => any>(
   fn: T,
-  options: UseThrottleOptions = {},
-): ThrottledFn<T> {
-  const { wait = 300, leading = true, trailing = true } = options;
+  options: UseThrottleOptions = {
+    interval: 1000,
+    leading: true,
+    trailing: false,
+  },
+): { throttleFn: throttleFn<T>; cancel: () => void } {
+  const {
+    interval = 1000,
+    leading = true,
+    trailing = false,
+    resultCallback,
+  } = options;
 
+  /** 保存上一次真正执行 fn 的时间 */
+  const lastTimeRef = useRef(0);
+  /** 保存 trailing 定时器 */
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** 保存最新的 fn，避免闭包问题 */
   const fnRef = useRef(fn);
-  const throttledRef = useRef<ThrottledFn<T> | null>(null);
 
   useEffect(() => {
     fnRef.current = fn;
   }, [fn]);
 
+  /** 组件卸载时清理 trailing 定时器，避免在已卸载组件上执行 fn */
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    let lastCallTime = 0;
-    let lastArgs: Parameters<T> | null = null;
-    let result: ReturnType<T> | undefined;
-
-    function invoke(time: number) {
-      lastCallTime = time;
-      result = fnRef.current(...(lastArgs as Parameters<T>));
-      lastArgs = null;
-      return result;
-    }
-
-    function remainingWait(time: number) {
-      return wait - (time - lastCallTime);
-    }
-
-    function shouldInvoke(time: number) {
-      return lastCallTime === 0 || time - lastCallTime >= wait;
-    }
-
-    function timerExpired() {
-      const time = Date.now();
-      if (shouldInvoke(time)) {
-        if (trailing && lastArgs) {
-          invoke(time);
-        }
-        timer = null;
-      } else {
-        timer = setTimeout(timerExpired, remainingWait(time));
-      }
-    }
-
-    const throttledImpl = ((...args: Parameters<T>) => {
-      const time = Date.now();
-      const isInvoking = shouldInvoke(time);
-
-      lastArgs = args;
-
-      if (isInvoking) {
-        if (!timer) {
-          if (leading) {
-            invoke(time);
-          }
-          timer = setTimeout(timerExpired, wait);
-        }
-      }
-
-      if (!timer && trailing) {
-        timer = setTimeout(timerExpired, wait);
-      }
-
-      return result;
-    }) as ThrottledFn<T>;
-
-    throttledImpl.cancel = () => {
-      if (timer) clearTimeout(timer);
-      timer = null;
-      lastCallTime = 0;
-      lastArgs = null;
-    };
-
-    throttledImpl.flush = () => {
-      if (timer && lastArgs) {
-        clearTimeout(timer);
-        timer = null;
-        return invoke(Date.now());
-      }
-      return result;
-    };
-
-    throttledRef.current = throttledImpl;
-
     return () => {
-      throttledImpl.cancel();
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [wait, leading, trailing]);
-
-  // render 阶段返回“壳函数”及 cancel/flush，在 useMemo 内一次构造，避免修改 hook 返回值
-  return useMemo(() => {
-    const stableFn = (...args: Parameters<T>) =>
-      throttledRef.current?.(...args);
-    stableFn.cancel = () => throttledRef.current?.cancel();
-    stableFn.flush = () => throttledRef.current?.flush();
-    return stableFn as ThrottledFn<T>;
   }, []);
+
+  const throttleFn = useCallback(
+    (...args: any[]) => {
+      const nowTime = new Date().getTime();
+
+      /**
+       * 如果是：
+       *  - 第一次触发
+       *  - 并且 leading = false
+       * 那么把 lastTime 设置为当前时间
+       * 目的：禁止第一次立刻执行
+       */
+      if (!lastTimeRef.current && !leading) {
+        lastTimeRef.current = nowTime;
+      }
+      /**
+       * 计算剩余时间
+       * interval - (当前时间 - 上次执行时间)
+       */
+      const remainTime = interval - (nowTime - lastTimeRef.current);
+
+      if (remainTime <= 0) {
+        // 如果之前有 trailing 定时器，清掉
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+        const result = fnRef.current(...args);
+        // 执行结果回调
+        if (resultCallback) resultCallback(result);
+        // 更新上一次执行时间
+        lastTimeRef.current = nowTime;
+        return;
+      }
+      /**
+       * 没到时间 && 开启 trailing
+       * 且当前没有定时器
+       * → 开一个定时器兜底执行
+       */
+
+      if (!timerRef.current && trailing) {
+        timerRef.current = setTimeout(() => {
+          timerRef.current = null;
+          /**
+           * 如果 leading=false：
+           * trailing 执行完后要重置 lastTime
+           * 保证下次还能正常触发
+           */
+          lastTimeRef.current = !leading ? 0 : new Date().getTime();
+          const result = fnRef.current(...args);
+          if (resultCallback) resultCallback(result);
+        }, remainTime);
+      }
+      return undefined;
+    },
+    [interval, trailing, leading, resultCallback],
+  );
+  const cancel = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    lastTimeRef.current = 0;
+  }, []);
+  return { throttleFn, cancel };
 }
