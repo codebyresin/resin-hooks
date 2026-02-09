@@ -123,7 +123,7 @@ export default function UseSyncScrollDemo() {
               onScroll={onLeftScroll}
             >
               <div className="sync-scroll-inner">
-                {data.map((cat, i) => (
+                {data.map((cat: CategoryItem, i: number) => (
                   <div
                     key={cat.name}
                     ref={(el) => {
@@ -150,7 +150,7 @@ export default function UseSyncScrollDemo() {
               onScroll={onScroll}
             >
               <div className="sync-scroll-inner sync-scroll-products-inner sync-scroll-sections">
-                {data.map((cat, i) => (
+                {data.map((cat: CategoryItem, i: number) => (
                   <div
                     key={cat.name}
                     ref={(el) => {
@@ -160,14 +160,23 @@ export default function UseSyncScrollDemo() {
                   >
                     <h4 className="content-section__title">{cat.name}</h4>
                     <div className="product-grid">
-                      {cat.products.map((p) => (
-                        <div key={p.id} className="product-card">
-                          <div className="product-card__thumb" />
-                          <div className="product-card__name">{p.name}</div>
-                          <div className="product-card__price">¥{p.price}</div>
-                          <span className="product-card__tag">{p.desc}</span>
-                        </div>
-                      ))}
+                      {cat.products.map(
+                        (p: {
+                          id: number;
+                          name: string;
+                          price: number;
+                          desc: string;
+                        }) => (
+                          <div key={p.id} className="product-card">
+                            <div className="product-card__thumb" />
+                            <div className="product-card__name">{p.name}</div>
+                            <div className="product-card__price">
+                              ¥{p.price}
+                            </div>
+                            <span className="product-card__tag">{p.desc}</span>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                 ))}

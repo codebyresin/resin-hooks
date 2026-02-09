@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useVirtualList } from '@resin-hooks/core';
+import { useVirtualList, type VirtualListItem } from '@resin-hooks/core';
 import './demo.css';
 
 export default function UseVirtualListDemo() {
@@ -62,35 +62,43 @@ export default function UseVirtualListDemo() {
           }}
         >
           <div style={{ height: totalHeight, position: 'relative' }}>
-            {visibleList.map((item) => (
-              <div
-                key={item.index}
-                style={{
-                  position: 'absolute',
-                  top: item.offset,
-                  height: 50,
-                  width: '100%',
-                  padding: '0 1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderBottom: '1px solid #f0f0f0',
-                  backgroundColor: item.index % 2 === 0 ? '#fff' : '#fafafa',
-                }}
-              >
-                <div>
-                  <strong>{item.data.name}</strong>
-                  <span
-                    style={{
-                      marginLeft: '1rem',
-                      color: '#666',
-                      fontSize: '0.9rem',
-                    }}
-                  >
-                    {item.data.description}
-                  </span>
+            {visibleList.map(
+              (
+                item: VirtualListItem<{
+                  id: number;
+                  name: string;
+                  description: string;
+                }>,
+              ) => (
+                <div
+                  key={item.index}
+                  style={{
+                    position: 'absolute',
+                    top: item.offset,
+                    height: 50,
+                    width: '100%',
+                    padding: '0 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    borderBottom: '1px solid #f0f0f0',
+                    backgroundColor: item.index % 2 === 0 ? '#fff' : '#fafafa',
+                  }}
+                >
+                  <div>
+                    <strong>{item.data.name}</strong>
+                    <span
+                      style={{
+                        marginLeft: '1rem',
+                        color: '#666',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {item.data.description}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </div>
       </div>
