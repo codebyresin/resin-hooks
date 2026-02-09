@@ -12,7 +12,12 @@ Resin Hooks 提供了一系列实用的 React Hooks，帮助开发者更高效�
 ### 性能优化
 
 - [useThrottle](/hooks/useThrottle) - 节流，限制函数执行频率
+- [useDebounce](/hooks/useDebounce) - 防抖，延迟执行函数
 - [useVirtualList](/hooks/useVirtualList) - 虚拟列表，高效渲染大量数据
+
+### 数据与导出
+
+- [useExcelExport](/hooks/useExcelExport) - Excel 导出，支持大批量、进度、表头映射
 
 ## 快速开始
 
@@ -33,7 +38,9 @@ import {
   useBoolean,
   useLatest,
   useThrottle,
+  useDebounce,
   useVirtualList,
+  useExcelExport,
 } from '@resin-hooks/core';
 
 function App() {
@@ -48,10 +55,21 @@ function App() {
     interval: 500,
   });
 
+  // 使用 useDebounce
+  const { debounceFn } = useDebounce((val) => fetchSearch(val), {
+    delay: 300,
+  });
+
   // 使用 useVirtualList
   const { list, containerProps, totalHeight } = useVirtualList(data, {
     containerHeight: 400,
     itemHeight: 50,
+  });
+
+  // 使用 useExcelExport
+  const { exportExcel, progress, loading } = useExcelExport({
+    filename: 'data.xlsx',
+    headersMap: { id: 'ID', name: '姓名' },
   });
 
   return <div>...</div>;
@@ -97,6 +115,19 @@ function App() {
 
 [查看完整文档 →](/hooks/useThrottle)
 
+### useDebounce
+
+防抖 Hook，在指定延迟内多次调用时只会执行最后一次。
+
+**特性：**
+
+- 可配置 delay、immediate
+- 支持 resultCallback 获取执行结果
+- 提供 cancel 取消未执行的调用
+- 适用于搜索输入、表单校验等场景
+
+[查看完整文档 →](/hooks/useDebounce)
+
 ### useVirtualList
 
 虚拟列表 Hook，用于高效渲染大量数据列表。
@@ -109,6 +140,19 @@ function App() {
 - 性能优化，支持万级数据渲染
 
 [查看完整文档 →](/hooks/useVirtualList)
+
+### useExcelExport
+
+前端 Excel 导出 Hook，支持大批量数据、进度展示、取消导出。
+
+**特性：**
+
+- 分批处理、进度条、支持取消
+- 表头映射（headersMap）、部分列导出（columns）
+- 支持数组或异步数据源
+- 适用于后台管理系统列表导出
+
+[查看完整文档 →](/hooks/useExcelExport)
 
 ## 贡献
 

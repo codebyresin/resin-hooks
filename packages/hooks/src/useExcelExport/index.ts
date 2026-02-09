@@ -148,8 +148,8 @@ export function useExcelExport(
           }));
         }
 
-        const dataKeys = resolvedColumns.map((c) => c.key);
-        const displayHeaders = resolvedColumns.map((c) => c.label);
+        const dataKeys = resolvedColumns.map((item) => item.key);
+        const displayHeaders = resolvedColumns.map((item) => item.label);
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet([displayHeaders]);

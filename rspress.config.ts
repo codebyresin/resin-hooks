@@ -69,7 +69,14 @@ export default defineConfig({
               text: '性能优化',
               items: [
                 { text: 'useThrottle', link: '/hooks/useThrottle' },
+                { text: 'useDebounce', link: '/hooks/useDebounce' },
                 { text: 'useVirtualList', link: '/hooks/useVirtualList' },
+              ],
+            },
+            {
+              text: '数据与导出',
+              items: [
+                { text: 'useExcelExport', link: '/hooks/useExcelExport' },
               ],
             },
           ],
