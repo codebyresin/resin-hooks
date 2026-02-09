@@ -2,158 +2,118 @@ import { useState, useCallback } from 'react';
 import { useExcelExport } from '@resin-hooks/core';
 import './demo.css';
 
-const API_BASE = 'http://localhost:8080/api/excel';
+/** 多级表头节点类型（与 ExcelHeader 兼容） */
+type MultiHeader = { label: string; key?: string; children?: MultiHeader[] };
 
-/** 交易流水：字段 key → 中文表头 */
-const TRANSACTIONS_COLUMNS: Record<string, string> = {
-  txnId: '交易流水号',
-  txnDate: '交易日期',
-  txnTime: '交易时间',
-  type: '交易类型',
-  amount: '交易金额',
-  balance: '账户余额',
-  counterpartyAccount: '对方账户',
-  counterpartyName: '对方户名',
-  status: '交易状态',
-  remark: '备注',
+/** 单级表头：字段 key → 中文表头 */
+const SIMPLE_HEADERS_MAP: Record<string, string> = {
+  name: '姓名',
+  age: '年龄',
+  department: '部门',
+  salary: '薪资',
 };
 
-/** 账户列表：字段 key → 中文表头 */
-const ACCOUNTS_COLUMNS: Record<string, string> = {
-  accountNo: '账号',
-  accountName: '户名',
-  bank: '开户行',
-  accountType: '账户类型',
-  balance: '余额',
-  openDate: '开户日期',
-  status: '状态',
+/** 多级表头示例 */
+const MULTI_LEVEL_HEADERS: MultiHeader[] = [
+  {
+    label: '基本信息',
+    children: [
+      { label: '姓名', key: 'name' },
+      { label: '年龄', key: 'age' },
+      {
+        label: '工作信息',
+        children: [
+          { label: '部门', key: 'department' },
+          { label: '薪资', key: 'salary' },
+        ],
+      },
+    ],
+  },
+  {
+    label: '联系方式',
+    children: [
+      { label: '手机', key: 'phone' },
+      { label: '邮箱', key: 'email' },
+    ],
+  },
+];
+
+/** 多级表头对应的字段映射 */
+const MULTI_HEADERS_MAP: Record<string, string> = {
+  name: '姓名',
+  age: '年龄',
+  department: '部门',
+  salary: '薪资',
+  phone: '手机',
+  email: '邮箱',
 };
 
-/** 数据类型选项 */
-const DATA_TYPE_OPTIONS = [
-  { value: 'transactions', label: '交易流水' },
-  { value: 'accounts', label: '账户列表' },
-];
-
-/** 导出数量选项 */
-const COUNT_OPTIONS = [
-  { value: 100, label: '100 条' },
-  { value: 500, label: '500 条' },
-  { value: 1000, label: '1000 条' },
-  { value: 5000, label: '5000 条' },
-  { value: 10000, label: '10000 条' },
-];
-
-/** 交易类型筛选 */
-const TXN_TYPES = [
-  { value: '', label: '全部' },
-  { value: '转账', label: '转账' },
-  { value: '存款', label: '存款' },
-  { value: '取款', label: '取款' },
-  { value: '消费', label: '消费' },
-];
-
-/** 生成模拟数据（无后端时使用） */
-function genMockData(type: 'transactions' | 'accounts', count: number) {
-  if (type === 'transactions') {
-    return Array.from({ length: count }, (_, i) => ({
-      txnId: `T${Date.now()}${i}`,
-      txnDate: '2024-01-15',
-      txnTime: '10:30:00',
-      type: ['转账', '存款', '取款', '消费'][i % 4],
-      amount: (Math.random() * 5000 - 500).toFixed(2),
-      balance: (10000 + i * 100).toFixed(2),
-      counterpartyAccount: `6222${String(i).padStart(12, '0')}`,
-      counterpartyName: `用户${i}`,
-      status: '成功',
-      remark: '',
-    }));
-  }
+/** 生成模拟数据 */
+function genMockData(count: number) {
   return Array.from({ length: count }, (_, i) => ({
-    accountNo: `6222${String(i).padStart(12, '0')}`,
-    accountName: `账户${i + 1}`,
-    bank: '中国银行',
-    accountType: '储蓄卡',
-    balance: (Math.random() * 100000).toFixed(2),
-    openDate: '2023-01-01',
-    status: '正常',
+    name: `员工${i + 1}`,
+    age: 22 + (i % 20),
+    department: ['研发部', '产品部', '市场部', '人力资源'][i % 4],
+    salary: (8000 + Math.random() * 12000).toFixed(0),
+    phone: `138${String(i).padStart(8, '0')}`,
+    email: `user${i + 1}@example.com`,
   }));
 }
 
 export default function UseExcelExportDemo() {
-  const [dataType, setDataType] = useState<'transactions' | 'accounts'>(
-    'transactions',
-  );
-  const [count, setCount] = useState(500);
-  const [filterType, setFilterType] = useState('');
-  const [downloadStatus, setDownloadStatus] = useState('');
-  const [useMock, setUseMock] = useState(false);
+  const [mode, setMode] = useState<'simple' | 'multi'>('simple');
+  const [dataCount, setDataCount] = useState(100);
+  const [useAsync, setUseAsync] = useState(false);
 
-  const columnsMap =
-    dataType === 'transactions' ? TRANSACTIONS_COLUMNS : ACCOUNTS_COLUMNS;
-
-  const { exportExcel, progress, loading, error, cancel } = useExcelExport({
-    filename: dataType === 'accounts' ? '账户列表.xlsx' : '交易流水.xlsx',
-    chunkSize: 2000,
-    headersMap: columnsMap,
+  const { exportExcel, progress, loading, errorInfo } = useExcelExport({
+    fileName: mode === 'simple' ? '员工列表.xlsx' : '员工列表-多级表头.xlsx',
+    sheetName: 'Sheet1',
+    headersMap: mode === 'simple' ? SIMPLE_HEADERS_MAP : MULTI_HEADERS_MAP,
+    ...(mode === 'multi' && { headers: MULTI_LEVEL_HEADERS }),
   });
 
   const handleExport = useCallback(() => {
-    setDownloadStatus('');
-    if (useMock) {
-      exportExcel(genMockData(dataType, count));
-    } else {
+    if (useAsync) {
+      // 模拟异步拉取数据
       exportExcel(async () => {
-        const params = new URLSearchParams({
-          type: dataType,
-          count: String(count),
-          keys: 'en',
-        });
-        if (filterType) params.set('txnType', filterType);
-        const res = await fetch(`${API_BASE}/export?${params}`);
-        const { data } = await res.json();
-        return data;
+        await new Promise((r) => setTimeout(r, 500));
+        return genMockData(dataCount);
       });
+    } else {
+      exportExcel(genMockData(dataCount));
     }
-  }, [exportExcel, dataType, count, filterType, useMock]);
+  }, [exportExcel, dataCount, useAsync]);
 
   return (
     <div>
       <h2>useExcelExport Demo</h2>
       <p className="demo-description">
-        选择导出数据类型与数量。使用模拟数据无需后端；真实接口需先启动{' '}
-        <code>pnpm api:dev</code>。
+        将数据导出为 Excel 文件。支持单级表头、多级表头，以及同步/异步数据源。
       </p>
 
       <div className="demo-section">
         <div className="excel-controls excel-controls--block">
           <div className="excel-control-row">
-            <label>导出数据类型：</label>
+            <label>表头模式：</label>
             <select
-              value={dataType}
-              onChange={(e) =>
-                setDataType(e.target.value as 'transactions' | 'accounts')
-              }
+              value={mode}
+              onChange={(e) => setMode(e.target.value as 'simple' | 'multi')}
             >
-              {DATA_TYPE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
+              <option value="simple">单级表头</option>
+              <option value="multi">多级表头</option>
             </select>
           </div>
 
           <div className="excel-control-row">
-            <label>导出数量：</label>
+            <label>导出条数：</label>
             <select
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value))}
+              value={dataCount}
+              onChange={(e) => setDataCount(Number(e.target.value))}
             >
-              {COUNT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
+              <option value={50}>50 条</option>
+              <option value={100}>100 条</option>
+              <option value={500}>500 条</option>
+              <option value={1000}>1000 条</option>
             </select>
           </div>
 
@@ -161,28 +121,12 @@ export default function UseExcelExportDemo() {
             <label>
               <input
                 type="checkbox"
-                checked={useMock}
-                onChange={(e) => setUseMock(e.target.checked)}
+                checked={useAsync}
+                onChange={(e) => setUseAsync(e.target.checked)}
               />
-              使用模拟数据（无需后端）
+              使用异步数据源（模拟接口请求）
             </label>
           </div>
-
-          {dataType === 'transactions' && (
-            <div className="excel-control-row">
-              <label>交易类型筛选：</label>
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                {TXN_TYPES.map((t) => (
-                  <option key={t.value || 'all'} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
         </div>
 
         <div className="excel-buttons">
@@ -191,26 +135,39 @@ export default function UseExcelExportDemo() {
             disabled={loading}
             className="btn btn-primary"
           >
-            {loading ? '导出中...' : '导出'}
+            {loading ? '导出中...' : '导出 Excel'}
           </button>
           {loading && (
             <div className="excel-progress-wrap">
               <progress value={progress} max={100} className="excel-progress" />
               <span>{Math.round(progress)}%</span>
-              <button
-                onClick={cancel}
-                className="btn btn-secondary excel-cancel-btn"
-              >
-                取消
-              </button>
             </div>
-          )}
-          {downloadStatus && (
-            <span className="excel-download-status">{downloadStatus}</span>
           )}
         </div>
 
-        {error && <div className="excel-error">错误：{error.message}</div>}
+        {errorInfo && (
+          <div className="excel-error">错误：{errorInfo.message}</div>
+        )}
+      </div>
+
+      <div className="demo-code">
+        <h3>使用示例</h3>
+        <pre>
+          <code>{`// 单级表头
+const { exportExcel, loading, progress, errorInfo } = useExcelExport({
+  fileName: '导出数据.xlsx',
+  headersMap: { name: '姓名', age: '年龄' },
+});
+
+// 同步数据
+exportExcel([{ name: '张三', age: 25 }]);
+
+// 异步数据
+exportExcel(async () => {
+  const res = await fetch('/api/data');
+  return res.json();
+});`}</code>
+        </pre>
       </div>
     </div>
   );
