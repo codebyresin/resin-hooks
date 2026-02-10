@@ -1,8 +1,9 @@
 /**
- * Rollup 打包配置文件
+ * Rollup 打包配置文件（.mjs 供 CI/Node 直接加载）
  */
 import { defineConfig } from 'rollup';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import alias from '@rollup/plugin-alias';
 import typescript from '@rollup/plugin-typescript';
 import del from 'rollup-plugin-delete';
@@ -10,8 +11,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 
-// 使用 process.cwd()，build 时在 package 根目录执行
-const __dirname = process.cwd();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   input: 'src/index.ts',
