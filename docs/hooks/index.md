@@ -17,7 +17,7 @@ Resin Hooks 提供了一系列实用的 React Hooks，帮助开发者更高效�
 
 ### 数据与导出
 
-- [useExcelExport](/hooks/useExcelExport) - Excel 导出，支持大批量、进度、表头映射
+- [useExcelExport](/hooks/useExcelExport) - Excel 导出，支持单级/多级表头、表头映射、同步/异步数据源
 
 ## 快速开始
 
@@ -68,7 +68,7 @@ function App() {
 
   // 使用 useExcelExport
   const { exportExcel, progress, loading } = useExcelExport({
-    filename: 'data.xlsx',
+    fileName: 'data.xlsx',
     headersMap: { id: 'ID', name: '姓名' },
   });
 
@@ -143,14 +143,14 @@ function App() {
 
 ### useExcelExport
 
-前端 Excel 导出 Hook，支持大批量数据、进度展示、取消导出。
+前端 Excel 导出 Hook，支持单级表头、多级表头、表头映射、部分列导出。
 
 **特性：**
 
-- 分批处理、进度条、支持取消
-- 表头映射（headersMap）、部分列导出（columns）
+- 单级表头、多级表头（headersMap、headers）
+- 部分列导出（colums）
 - 支持数组或异步数据源
-- 适用于后台管理系统列表导出
+- 进度、loading、errorInfo 便于 UI 展示
 
 [查看完整文档 →](/hooks/useExcelExport)
 

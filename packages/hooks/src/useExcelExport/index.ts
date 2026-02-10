@@ -14,6 +14,7 @@ export interface UseExcelExportOptions {
   headersMap?: Record<string, string>; // 字段映射
   colums?: string[]; // 指定导出的列
   headers?: ExcelHeader[]; //支持多级表头
+  chunkSize?: number; // 每批处理行数，用于计算进度与取消检测，默认 5000
 }
 
 //导出
@@ -26,6 +27,7 @@ export interface UseExcelExportReturn {
   loading: boolean;
   errorInfo: Error | null;
   progress: number;
+  cancel: () => void; // 取消当前导出
 }
 
 //多级表头加上aoa_to_sheet+!merges
@@ -116,6 +118,9 @@ export function buildMerges(headers: ExcelHeader[]) {
   return merges;
 }
 
+/** 每批处理后让出主线程，便于取消检测与进度更新 */
+const yieldToMain = () => new Promise<void>((r) => setTimeout(r, 0));
+
 //*core
 export function useExcelExport(
   options: UseExcelExportOptions,
@@ -128,6 +133,10 @@ export function useExcelExport(
   const [errorInfo, setErrorInfo] = useState<Error | null>(null);
 
   const cancelledRef = useRef(false);
+
+  const cancel = useCallback(() => {
+    cancelledRef.current = true;
+  }, []);
 
   const exportExcel = useCallback(
     async (
@@ -143,50 +152,57 @@ export function useExcelExport(
         const realData = typeof data === 'function' ? await data() : data;
         if (!Array.isArray(realData) || realData.length === 0)
           throw new Error('无数据导出');
-        const wb = XLSX.utils.book_new();
 
-        let aoa: any[][] = [];
+        const chunkSize = options?.chunkSize ?? 5000;
+        const total = realData.length;
+        let headerRows: string[][];
+        let leafKeys: string[] | null = null;
+        let keys: string[];
         let merges: XLSX.Range[] | undefined;
 
-        // ✅ 如果传了多级表头
         if (options?.headers && options.headers.length > 0) {
-          const { headerRows, leafKeys } = buildHeaderRows(options.headers);
+          const built = buildHeaderRows(options.headers);
+          headerRows = built.headerRows;
+          leafKeys = built.leafKeys;
           merges = buildMerges(options.headers);
-
-          const bodyRows = realData.map((row) =>
-            leafKeys.map((key) => row[key] ?? ''),
-          );
-
-          aoa = [...headerRows, ...bodyRows];
+          keys = leafKeys;
         } else {
-          // ✅ 普通单级表头
-          const keys = options?.colums ?? Object.keys(realData[0]);
-
+          keys = options?.colums ?? Object.keys(realData[0] as object);
           const header = keys.map((k) => options?.headersMap?.[k] ?? k);
-
-          const body = realData.map((row) => keys.map((k) => row[k] ?? ''));
-
-          aoa = [header, ...body];
+          headerRows = [header];
         }
 
-        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        const aoa: unknown[][] = [...headerRows];
 
-        if (merges) {
-          ws['!merges'] = merges;
+        for (let offset = 0; offset < total; offset += chunkSize) {
+          if (cancelledRef.current) return;
+          const chunk = realData.slice(offset, offset + chunkSize);
+          const rows = chunk.map((row) => keys.map((k) => row[k] ?? ''));
+          aoa.push(...rows);
+          setProgress(Math.round(((offset + chunk.length) / total) * 100));
+          await yieldToMain();
         }
 
+        if (cancelledRef.current) return;
+
+        const ws = XLSX.utils.aoa_to_sheet(aoa as string[][]);
+        if (merges) ws['!merges'] = merges;
+
+        const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, options?.sheetName ?? 'Sheet1');
-
         XLSX.writeFile(wb, `${options?.fileName ?? '导出数据'}.xlsx`);
 
         setProgress(100);
       } catch (err) {
-        setErrorInfo(err instanceof Error ? err : new Error(String(err)));
+        if (!cancelledRef.current) {
+          setErrorInfo(err instanceof Error ? err : new Error(String(err)));
+        }
       } finally {
         setLoading(false);
       }
     },
     [
+      options?.chunkSize,
       options?.colums,
       options?.fileName,
       options?.headers,
@@ -195,5 +211,5 @@ export function useExcelExport(
     ],
   );
 
-  return { exportExcel, progress, loading, errorInfo };
+  return { exportExcel, progress, loading, errorInfo, cancel };
 }

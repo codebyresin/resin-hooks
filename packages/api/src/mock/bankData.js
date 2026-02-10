@@ -76,7 +76,7 @@ function genTransactionsEn(count) {
       txnId: randomId(),
       txnDate: formatDate(date),
       txnTime: formatTime(new Date()),
-      type: type,
+      type: typeEn,
       amount: amount,
       balance: balance,
       counterpartyAccount: `6222${String(Math.floor(Math.random() * 1e12)).padStart(12, '0')}`,

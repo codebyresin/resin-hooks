@@ -33,32 +33,61 @@ const ACCOUNTS_HEADERS_MAP = {
   status: '状态',
 };
 
+// GET /api/excel/ping - 健康检查
+router.get('/ping', (req, res) => {
+  res.json({ ok: true, message: 'excel route ok' });
+});
+
 // GET /api/excel/export - 返回 JSON 数据（供前端 useExcelExport 用 xlsx 生成）
-// 支持 query: type, count, keys=zh|en, txnType=交易类型筛选
-router.get('/export', (req, res) => {
-  const {
-    type = 'transactions',
-    count = 500,
-    keys = 'zh',
-    txnType,
-  } = req.query;
-  const num = Math.min(Math.max(Number(count) || 500, 1), 200000);
-  const useEn = keys === 'en';
+// 支持 query: type, count, keys=zh|en, txnType=交易类型筛选, columns=逗号分隔的列
+router.get('/export', (req, res, next) => {
+  try {
+    const {
+      type = 'transactions',
+      count = 500,
+      keys = 'en',
+      txnType,
+      columns,
+    } = req.query;
+    const num = Math.min(Math.max(Number(count) || 500, 1), 200000);
+    const useEn = keys === 'en';
 
-  let data;
-  if (type === 'accounts') {
-    data = useEn
-      ? genAccountsEn(Math.min(num, 100))
-      : genAccounts(Math.min(num, 100));
-  } else {
-    data = useEn ? genTransactionsEn(num) : genTransactions(num);
-    if (txnType) {
-      const typeKey = useEn ? 'type' : '交易类型';
-      data = data.filter((row) => row[typeKey] === txnType);
+    let data;
+    if (type === 'accounts') {
+      const accountCount = Math.min(num, 10000);
+      data = useEn ? genAccountsEn(accountCount) : genAccounts(accountCount);
+    } else {
+      data = useEn ? genTransactionsEn(num) : genTransactions(num);
+      if (txnType) {
+        const typeKey = useEn ? 'type' : '交易类型';
+        data = data.filter((row) => row[typeKey] === txnType);
+      }
     }
-  }
 
-  res.json({ ok: true, data, total: data.length });
+    // 若指定 columns，只返回这些列
+    if (columns && typeof columns === 'string' && data.length > 0) {
+      const cols = columns
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean);
+      if (cols.length > 0) {
+        const allKeys = Object.keys(data[0]);
+        const validCols = cols.filter((c) => allKeys.includes(c));
+        if (validCols.length > 0) {
+          data = data.map((row) => {
+            const o = {};
+            validCols.forEach((k) => (o[k] = row[k]));
+            return o;
+          });
+        }
+      }
+    }
+
+    res.json({ ok: true, data, total: data.length });
+  } catch (err) {
+    console.error('[excel/export]', err);
+    next(err);
+  }
 });
 
 // GET /api/excel/download - 后端用 exceljs 生成 Excel 文件并返回

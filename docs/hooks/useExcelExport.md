@@ -1,6 +1,6 @@
 # useExcelExport
 
-前端 Excel 导出 Hook，支持大批量数据、进度展示、取消导出，以及表头映射与部分列导出。
+前端 Excel 导出 Hook，支持单级表头、多级表头、表头映射、部分列导出，以及同步/异步数据源。
 
 ## 基本信息
 
@@ -10,12 +10,11 @@
 
 ## 特性
 
-- **分批处理**：按 `chunkSize` 分批写入，避免阻塞主线程
-- **进度展示**：`progress` 0-100，便于 UI 展示进度条
-- **支持取消**：`cancel()` 可中断导出
-- **表头映射**：`headersMap` 将后端英文字段转为中文表头
-- **部分导出**：`columns` 限定导出列，适用于「后端返回多字段、前端只导出部分」场景
-- **数据源灵活**：支持直接传入数组或 `() => Promise<data[]>` 的异步函数
+- **单级表头**：`headersMap` 将英文字段映射为中文表头
+- **多级表头**：`headers` 支持多级分组，自动合并单元格
+- **部分列导出**：`colums` 指定导出的列
+- **数据源灵活**：支持直接传入数组或 `() => Promise<data[]>` 异步函数
+- **进度与状态**：`progress`、`loading`、`errorInfo` 便于 UI 展示
 
 ## 参数
 
@@ -25,41 +24,45 @@
 
 ### UseExcelExportOptions
 
-| 属性             | 类型                                          | 默认值          | 说明                                              |
-| ---------------- | --------------------------------------------- | --------------- | ------------------------------------------------- |
-| filename         | `string`                                      | `'export.xlsx'` | 导出文件名                                        |
-| sheetName        | `string`                                      | `'Sheet1'`      | 工作表名                                          |
-| chunkSize        | `number`                                      | `5000`          | 每批处理行数，用于计算进度                        |
-| headersMap       | `Record<string, string>`                      | -               | 字段 key → 表头文案，如 `{ txnId: '交易流水号' }` |
-| columns          | `string[]`                                    | -               | 要导出的列（字段 key 数组），不传则导出全部       |
-| headersTransform | `(dataKeys: string[]) => ExcelColumnConfig[]` | -               | 高级：动态过滤、排序、重命名表头，优先级最高      |
+| 属性       | 类型                     | 默认值       | 说明                                                    |
+| ---------- | ------------------------ | ------------ | ------------------------------------------------------- |
+| fileName   | `string`                 | `'导出数据'` | 导出文件名（含 .xlsx 后缀由 Hook 自动添加时可不带）     |
+| sheetName  | `string`                 | `'Sheet1'`   | 工作表名                                                |
+| headersMap | `Record<string, string>` | -            | 字段 key → 表头文案，如 `{ txnId: '交易流水号' }`       |
+| colums     | `string[]`               | -            | 要导出的列（字段 key 数组），不传则按数据第一行全部导出 |
+| headers    | `ExcelHeader[]`          | -            | 多级表头配置，传入时启用多级表头                        |
 
-### ExcelColumnConfig
+### ExcelHeader（多级表头）
 
 ```ts
-type ExcelColumnConfig = { key: string; label: string };
+type ExcelHeader = {
+  label: string; // 表头显示文字
+  key?: string; // 对应字段（仅叶子节点需要）
+  children?: ExcelHeader[];
+};
 ```
+
+叶子节点需要 `key` 对应数据字段；非叶子节点用 `label` 作为分组标题，通过 `children` 嵌套。
 
 ## 返回值
 
 | 属性        | 类型                                                                      | 说明                                       |
 | ----------- | ------------------------------------------------------------------------- | ------------------------------------------ |
 | exportExcel | `(data: Record<string,unknown>[] \| () => Promise<...>) => Promise<void>` | 执行导出，传入数据数组或返回数据的异步函数 |
-| progress    | `number`                                                                  | 导出进度 0-100                             |
 | loading     | `boolean`                                                                 | 是否正在导出                               |
-| error       | `Error \| null`                                                           | 错误信息                                   |
-| cancel      | `() => void`                                                              | 取消当前导出                               |
+| errorInfo   | `Error \| null`                                                           | 错误信息                                   |
+| progress    | `number`                                                                  | 导出进度 0-100                             |
 
 ## 使用示例
 
-### 基本用法
+### 基本用法（单级表头）
 
 ```tsx
 import { useExcelExport } from '@resin-hooks/core';
 
 function ExportButton() {
-  const { exportExcel, progress, loading, error, cancel } = useExcelExport({
-    filename: '交易流水.xlsx',
+  const { exportExcel, progress, loading, errorInfo } = useExcelExport({
+    fileName: '交易流水.xlsx',
     headersMap: {
       txnId: '交易流水号',
       txnDate: '交易日期',
@@ -80,42 +83,11 @@ function ExportButton() {
       <button onClick={handleExport} disabled={loading}>
         导出
       </button>
-      {loading && (
-        <>
-          <progress value={progress} max={100} />
-          <span>{Math.round(progress)}%</span>
-          <button onClick={cancel}>取消</button>
-        </>
-      )}
-      {error && <p>错误：{error.message}</p>}
+      {loading && <progress value={progress} max={100} />}
+      {errorInfo && <p>错误：{errorInfo.message}</p>}
     </div>
   );
 }
-```
-
-### 仅导出部分列
-
-```tsx
-// 后端返回 20 个字段，列表只展示 8 个，导出也只要这 8 个
-const { exportExcel } = useExcelExport({
-  filename: '交易流水.xlsx',
-  headersMap: TRANSACTIONS_COLUMNS,
-  columns: [
-    'txnId',
-    'txnDate',
-    'type',
-    'amount',
-    'balance',
-    'counterpartyName',
-    'status',
-    'remark',
-  ],
-});
-
-exportExcel(async () => {
-  const { data } = await fetch('/api/export').then((r) => r.json());
-  return data;
-});
 ```
 
 ### 传入静态数组
@@ -127,41 +99,97 @@ const data = [
 ];
 
 const { exportExcel } = useExcelExport({
-  filename: '列表.xlsx',
+  fileName: '列表.xlsx',
   headersMap: { id: 'ID', name: '姓名', amount: '金额' },
 });
 
 exportExcel(data);
 ```
 
-### 高级：headersTransform
+### 仅导出部分列
 
 ```tsx
-// 动态过滤、排序、重命名
+// 后端返回多字段，只导出指定列
 const { exportExcel } = useExcelExport({
-  headersTransform: (keys) =>
-    keys
-      .filter(k => !['internalId'].includes(k))
-      .sort((a, b) => /* 自定义排序 */)
-      .map(k => ({ key: k, label: headersMap[k] ?? k })),
+  fileName: '交易流水.xlsx',
+  headersMap: TRANSACTIONS_COLUMNS,
+  colums: [
+    'txnId',
+    'txnDate',
+    'type',
+    'amount',
+    'balance',
+    'counterpartyName',
+    'status',
+  ],
 });
+
+exportExcel(async () => {
+  const { data } = await fetch('/api/export').then((r) => r.json());
+  return data;
+});
+```
+
+### 多级表头
+
+```tsx
+import { useExcelExport, type ExcelHeader } from '@resin-hooks/core';
+
+const headers: ExcelHeader[] = [
+  {
+    label: '基本信息',
+    children: [
+      { label: '姓名', key: 'name' },
+      { label: '年龄', key: 'age' },
+      {
+        label: '工作信息',
+        children: [
+          { label: '部门', key: 'department' },
+          { label: '薪资', key: 'salary' },
+        ],
+      },
+    ],
+  },
+  {
+    label: '联系方式',
+    children: [
+      { label: '手机', key: 'phone' },
+      { label: '邮箱', key: 'email' },
+    ],
+  },
+];
+
+const { exportExcel } = useExcelExport({
+  fileName: '员工列表.xlsx',
+  headersMap: {
+    name: '姓名',
+    age: '年龄',
+    department: '部门',
+    salary: '薪资',
+    phone: '手机',
+    email: '邮箱',
+  },
+  headers,
+});
+
+exportExcel(employeesData);
 ```
 
 ## 设计思路
 
 1. **headersMap**：后端用英文字段，导出需中文表头，传入 `headersMap` 做字段 → 表头映射。
-2. **columns**：后端返回很多字段，列表只展示部分，导出也只需部分，传入 `columns` 限定导出列。
-3. **通用数据流**：Hook 始终拿到完整数据（fetch 全部），通过 `columns` / `headersTransform` 做列筛选与表头映射，无需改动接口。
-4. **优先级**：`headersTransform` > `columns` + `headersMap` > 全量 + `headersMap`
+2. **colums**：后端返回多字段，只导出部分时，传入 `colums` 限定导出列。
+3. **headers**：需要分组表头（如「基本信息 / 工作信息」）时，使用 `headers` 定义多级结构，由 Hook 自动处理合并单元格。
+4. **数据源**：支持 `exportExcel(data[])` 同步数据或 `exportExcel(async () => data[])` 异步拉取，适应不同业务场景。
 
 ## 使用场景
 
 - **后台管理系统**：列表页导出 Excel，支持筛选条件、自定义列
-- **报表导出**：大批量数据（10 万+）导出，带进度与取消
-- **数据备份**：将接口数据导出为 Excel 供离线查看
+- **报表导出**：将接口数据导出为 Excel 供离线查看
+- **多级表头报表**：财务、人事等需要分组表头的导出场景
 
 ## 注意事项
 
 - 需要安装 `xlsx` 依赖（`@resin-hooks/core` 已包含）
-- 大批量导出时建议 `chunkSize` 设置为 2000-5000，以平衡进度刷新频率与性能
 - 异步数据源需在 `exportExcel` 调用时传入函数，确保每次导出可获取最新数据
+- 多级表头模式下，`headers` 中叶子节点必须提供 `key`，且 `key` 需与数据字段一致

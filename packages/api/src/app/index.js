@@ -20,8 +20,11 @@ app.use((req, res) => {
 
 // 全局错误处理
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: err.message || 'Internal Server Error' });
+  console.error('[API Error]', err);
+  res.status(500).json({
+    ok: false,
+    error: err.message || 'Internal Server Error',
+  });
 });
 
 module.exports = app;
