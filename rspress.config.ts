@@ -66,6 +66,10 @@ export default defineConfig({
               ],
             },
             {
+              text: '存储与缓存',
+              items: [{ text: 'useStorage', link: '/hooks/useStorage' }],
+            },
+            {
               text: '性能优化',
               items: [
                 { text: 'useThrottle', link: '/hooks/useThrottle' },
@@ -95,7 +99,8 @@ export default defineConfig({
 
     // 页脚
     footer: {
-      message: '由 Resin Team 维护 © 2026 Resin Team. All rights reserved.',
+      message: `由 赣南医科大学 Resin 维护 © 2026 Resin. All rights reserved.
+技术支持：Resin`,
     },
 
     // 暗色模式

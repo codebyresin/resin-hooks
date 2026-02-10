@@ -6,6 +6,7 @@ import UseSyncScrollDemo from './demos/UseSyncScrollDemo';
 import UseVirtualListDemo from './demos/UseVirtualListDemo';
 import UseThrottleDemo from './demos/UseThrottleDemo';
 import UseExcelExportDemo from './demos/UseExcelExportDemo';
+import UseStorageDemo from './demos/UseStorageDemo';
 
 type DemoType =
   | 'useBoolean'
@@ -13,7 +14,8 @@ type DemoType =
   | 'useSyncScroll'
   | 'useVirtualList'
   | 'useThrottle'
-  | 'useExcelExport';
+  | 'useExcelExport'
+  | 'useStorage';
 
 const demos: { key: DemoType; name: string; component: React.ComponentType }[] =
   [
@@ -38,6 +40,11 @@ const demos: { key: DemoType; name: string; component: React.ComponentType }[] =
       key: 'useExcelExport',
       name: 'useExcelExport',
       component: UseExcelExportDemo,
+    },
+    {
+      key: 'useStorage',
+      name: 'useStorage',
+      component: UseStorageDemo,
     },
   ];
 

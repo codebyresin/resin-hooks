@@ -5,3 +5,4 @@ export * from './useVirtualList';
 export * from './useThrottle';
 export * from './useDebounce';
 export * from './useExcelExport';
+export * from './useStorage';

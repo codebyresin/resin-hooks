@@ -9,6 +9,10 @@ Resin Hooks 提供了一系列实用的 React Hooks，帮助开发者更高效�
 - [useBoolean](/hooks/useBoolean) - 管理布尔值状态
 - [useLatest](/hooks/useLatest) - 保存最新的值引用，解决闭包问题
 
+### 存储与缓存
+
+- [useStorage](/hooks/useStorage) - 封装 localStorage / sessionStorage，支持过期时间和跨标签页同步
+
 ### 性能优化
 
 - [useThrottle](/hooks/useThrottle) - 节流，限制函数执行频率
@@ -37,6 +41,7 @@ yarn add @resin-hooks/core
 import {
   useBoolean,
   useLatest,
+  useStorage,
   useThrottle,
   useDebounce,
   useVirtualList,
@@ -49,6 +54,13 @@ function App() {
 
   // 使用 useLatest
   const latestValue = useLatest(value);
+
+  // 使用 useStorage（localStorage 持久化）
+  const [token, setToken, removeToken] = useStorage<string>({
+    key: 'auth_token',
+    type: 'local',
+    defaultValue: '',
+  });
 
   // 使用 useThrottle
   const { throttleFn, cancel } = useThrottle((val) => console.log(val), {
