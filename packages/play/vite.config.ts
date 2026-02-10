@@ -20,18 +20,10 @@ export default defineConfig(() => {
     build: {
       outDir: 'dist',
       emptyOutDir: true,
-      lib: {
-        entry: 'src/main.tsx',
-      },
       rollupOptions: {
-        external: ['react', 'react-dom'],
         output: {
-          chunkFileNames: `dist/chunks/[name].js`,
+          chunkFileNames: `chunks/[name].js`,
           inlineDynamicImports: true,
-          globals: {
-            react: 'React',
-            'react-dom': 'ReactDOM',
-          },
         },
       },
     },

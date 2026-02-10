@@ -15,8 +15,8 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "tsx rollup -c rollup.config.ts",
-    "dev": "tsx rollup -c rollup.config.ts -w",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
     "prepublishOnly": "pnpm build"
   },
   "files": [
