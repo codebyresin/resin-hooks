@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { useVirtualList, type VirtualListItem } from '@resin-hooks/core';
+import {
+  useVirtualList,
+  type VirtualListItem,
+} from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 export default function UseVirtualListDemo() {

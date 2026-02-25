@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useDebounce } from '@resin-hooks/core';`
+- **引入**：`import { useDebounce } from '@resincoder/resin-hooks-core';`
 - **类型**：`useDebounce<T>(fn: T, options?: UseDebounceOptions): { debounceFn: DebounceFn<T>; cancel: () => void }`
 
 ## 与 useThrottle 的区别
@@ -43,7 +43,7 @@
 
 ```tsx
 import { useState } from 'react';
-import { useDebounce } from '@resin-hooks/core';
+import { useDebounce } from '@resincoder/resin-hooks-core';
 
 function SearchInput() {
   const [value, setValue] = useState('');

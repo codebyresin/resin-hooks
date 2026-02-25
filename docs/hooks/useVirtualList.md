@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useVirtualList } from '@resin-hooks/core';`
+- **引入**：`import { useVirtualList } from '@resincoder/resin-hooks-core';`
 - **类型**：`useVirtualList<T>(list: T[], options?: UseVirtualListOptions): UseVirtualListReturn<T>`
 
 ## 参数
@@ -48,7 +48,7 @@
 
 ```tsx
 import { useState } from 'react';
-import { useVirtualList } from '@resin-hooks/core';
+import { useVirtualList } from '@resincoder/resin-hooks-core';
 
 function VirtualListExample() {
   const [list] = useState(() =>
@@ -89,7 +89,7 @@ function VirtualListExample() {
 ### 动态高度
 
 ```tsx
-import { useVirtualList } from '@resin-hooks/core';
+import { useVirtualList } from '@resincoder/resin-hooks-core';
 
 function DynamicHeightList() {
   const list = Array.from({ length: 1000 }, (_, i) => ({
@@ -132,7 +132,7 @@ function DynamicHeightList() {
 ### 滚动控制
 
 ```tsx
-import { useVirtualList } from '@resin-hooks/core';
+import { useVirtualList } from '@resincoder/resin-hooks-core';
 
 function ScrollableList() {
   const list = Array.from({ length: 10000 }, (_, i) => ({

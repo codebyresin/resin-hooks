@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useExcelExport } from '@resin-hooks/core';
+import { useExcelExport } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 /** 多级表头节点类型（与 ExcelHeader 兼容） */

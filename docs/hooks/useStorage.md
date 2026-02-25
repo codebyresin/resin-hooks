@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useStorage } from '@resin-hooks/core';`
+- **引入**：`import { useStorage } from '@resincoder/resin-hooks-core';`
 - **类型**：
 
 ```ts
@@ -47,7 +47,7 @@ type UseStorageReturn<T> = [
 ### 1. 基础用法（localStorage 持久化 Token）
 
 ```tsx
-import { useStorage } from '@resin-hooks/core';
+import { useStorage } from '@resincoder/resin-hooks-core';
 
 function TokenManager() {
   const [token, setToken, removeToken] = useStorage<string>({
@@ -74,7 +74,7 @@ function TokenManager() {
 ### 2. 设置过期时间（如 30 分钟自动过期）
 
 ```tsx
-import { useStorage } from '@resin-hooks/core';
+import { useStorage } from '@resincoder/resin-hooks-core';
 
 function ExpireToken() {
   const [token, setToken, removeToken] = useStorage<string>({
@@ -108,7 +108,7 @@ function ExpireToken() {
 ### 3. 使用 sessionStorage（会话级存储）
 
 ```tsx
-import { useStorage } from '@resin-hooks/core';
+import { useStorage } from '@resincoder/resin-hooks-core';
 
 function SessionStorageExample() {
   const [value, setValue, clearValue] = useStorage<string>({

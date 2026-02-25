@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useThrottle } from '@resin-hooks/core';`
+- **引入**：`import { useThrottle } from '@resincoder/resin-hooks-core';`
 - **类型**：`useThrottle<T>(fn: T, options?: UseThrottleOptions): { throttleFn: ThrottleFn<T>; cancel: () => void }`
 
 ## 参数
@@ -36,7 +36,7 @@
 
 ```tsx
 import { useState } from 'react';
-import { useThrottle } from '@resin-hooks/core';
+import { useThrottle } from '@resincoder/resin-hooks-core';
 
 function SearchInput() {
   const [value, setValue] = useState('');

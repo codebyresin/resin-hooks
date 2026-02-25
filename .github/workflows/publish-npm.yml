@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: pnpm build:hooks
 
-      - name: Publish @resin-hooks/core
+      - name: Publish @resincoder/resin-hooks-core
         working-directory: packages/hooks
         run: npm publish --access public
         env:

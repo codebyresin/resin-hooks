@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useLatest } from '@resin-hooks/core';`
+- **引入**：`import { useLatest } from '@resincoder/resin-hooks-core';`
 - **类型**：`useLatest<T>(value: T): React.MutableRefObject<T>`
 
 ## 参数
@@ -23,7 +23,7 @@
 
 ```tsx
 import { useState, useEffect } from 'react';
-import { useLatest } from '@resin-hooks/core';
+import { useLatest } from '@resincoder/resin-hooks-core';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -51,7 +51,7 @@ function App() {
 
 ```tsx
 import { useState, useEffect } from 'react';
-import { useLatest } from '@resin-hooks/core';
+import { useLatest } from '@resincoder/resin-hooks-core';
 
 function SearchComponent() {
   const [keyword, setKeyword] = useState('');

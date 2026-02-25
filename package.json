@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "pnpm -r build",
-    "build:hooks": "pnpm --filter @resin-hooks/core build",
-    "build:watch": "pnpm --filter @resin-hooks/core dev",
+    "build:hooks": "pnpm --filter @resincoder/resin-hooks-core build",
+    "build:watch": "pnpm --filter @resincoder/resin-hooks-core dev",
     "clean": "pnpm -r exec -- node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "test": "jest",
     "test:watch": "jest --watch",

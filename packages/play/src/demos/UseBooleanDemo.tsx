@@ -1,4 +1,4 @@
-import { useBoolean } from '@resin-hooks/core';
+import { useBoolean } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 export default function UseBooleanDemo() {

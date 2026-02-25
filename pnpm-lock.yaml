@@ -160,7 +160,7 @@ importers:
 
   packages/play:
     dependencies:
-      '@resin-hooks/core':
+      '@resincoder/resin-hooks-core':
         specifier: workspace:*
         version: link:../hooks
       react:

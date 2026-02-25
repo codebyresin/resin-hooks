@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useBoolean } from '@resin-hooks/core';`
+- **引入**：`import { useBoolean } from '@resincoder/resin-hooks-core';`
 - **类型**：`useBoolean(initialValue?: boolean): [boolean, UseBooleanActions]`
 
 ## 参数
@@ -27,7 +27,7 @@
 ## 使用示例
 
 ```tsx
-import { useBoolean } from '@resin-hooks/core';
+import { useBoolean } from '@resincoder/resin-hooks-core';
 
 function App() {
   const [value, { setTrue, setFalse, toggle, set }] = useBoolean(false);

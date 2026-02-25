@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStorage } from '@resin-hooks/core';
+import { useStorage } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 type StorageType = 'local' | 'session';

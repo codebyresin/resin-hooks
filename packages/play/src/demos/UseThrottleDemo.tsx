@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useThrottle } from '@resin-hooks/core';
+import { useThrottle } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 export default function UseThrottleDemo() {

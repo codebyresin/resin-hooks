@@ -4,7 +4,7 @@
 
 ## 基本信息
 
-- **引入**：`import { useExcelExport } from '@resin-hooks/core';`
+- **引入**：`import { useExcelExport } from '@resincoder/resin-hooks-core';`
 - **类型**：`useExcelExport(options?: UseExcelExportOptions): UseExcelExportReturn`
 - **依赖**：基于 [SheetJS (xlsx)](https://sheetjs.com/) 实现
 
@@ -58,7 +58,7 @@ type ExcelHeader = {
 ### 基本用法（单级表头）
 
 ```tsx
-import { useExcelExport } from '@resin-hooks/core';
+import { useExcelExport } from '@resincoder/resin-hooks-core';
 
 function ExportButton() {
   const { exportExcel, progress, loading, errorInfo } = useExcelExport({
@@ -133,7 +133,7 @@ exportExcel(async () => {
 ### 多级表头
 
 ```tsx
-import { useExcelExport, type ExcelHeader } from '@resin-hooks/core';
+import { useExcelExport, type ExcelHeader } from '@resincoder/resin-hooks-core';
 
 const headers: ExcelHeader[] = [
   {
@@ -190,6 +190,6 @@ exportExcel(employeesData);
 
 ## 注意事项
 
-- 需要安装 `xlsx` 依赖（`@resin-hooks/core` 已包含）
+- 需要安装 `xlsx` 依赖（`@resincoder/resin-hooks-core` 已包含）
 - 异步数据源需在 `exportExcel` 调用时传入函数，确保每次导出可获取最新数据
 - 多级表头模式下，`headers` 中叶子节点必须提供 `key`，且 `key` 需与数据字段一致

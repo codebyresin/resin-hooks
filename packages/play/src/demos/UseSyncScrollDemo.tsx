@@ -5,7 +5,7 @@ import {
   useCallback,
   type RefObject,
 } from 'react';
-import { useCategoryScroll } from '@resin-hooks/core';
+import { useCategoryScroll } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 // 每个分类下展示的商品（按分类切分）

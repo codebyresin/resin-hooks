@@ -7,7 +7,7 @@ Resin Hooks 是一个实用的 React 业务 Hooks 库，提供了一系列常用
 ## 安装
 
 ```bash
-pnpm add @resin-hooks/core
+pnpm add @resincoder/resin-hooks-core
 ```
 
 ## 使用示例
@@ -15,7 +15,7 @@ pnpm add @resin-hooks/core
 ### useBoolean
 
 ```tsx
-import { useBoolean } from '@resin-hooks/core';
+import { useBoolean } from '@resincoder/resin-hooks-core';
 
 function App() {
   const [value, { setTrue, setFalse, toggle, set }] = useBoolean(false);

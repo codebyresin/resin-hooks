@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLatest } from '@resin-hooks/core';
+import { useLatest } from '@resincoder/resin-hooks-core';
 import './demo.css';
 
 export default function UseLatestDemo() {

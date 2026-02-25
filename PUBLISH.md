@@ -125,12 +125,12 @@ pnpm publish --access public
 1. **检查 NPM 包**
 
    ```bash
-   npm view @resin-hooks/core
+   npm view @resincoder/resin-hooks-core
    ```
 
 2. **测试安装**
    ```bash
-   npm install @resin-hooks/core@latest
+   npm install @resincoder/resin-hooks-core@latest
    ```
 
 ## 三、工作流说明
@@ -173,7 +173,7 @@ pnpm publish --access public
 
 - 检查 `NPM_TOKEN` secret 是否正确配置
 - 确保版本号已更新且不与已发布版本冲突
-- 检查包名 `@resin-hooks/core` 是否可用（需要 npm 组织或已注册的 scope）
+- 检查包名 `@resincoder/resin-hooks-core` 是否可用（需要 npm 组织或已注册的 scope）
 
 ### 3. 文档构建失败
 
