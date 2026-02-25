@@ -2,7 +2,6 @@
   "name": "@resin-hooks/core",
   "version": "1.0.0",
   "description": "实用的 React 业务 Hooks 库，提供了一系列常用的 React Hooks",
-  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
@@ -16,8 +15,8 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "build": "rollup -c rollup.config.mjs",
+    "dev": "rollup -c rollup.config.mjs -w",
     "prepublishOnly": "pnpm build"
   },
   "files": [

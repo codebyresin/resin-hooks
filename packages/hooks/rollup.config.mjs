@@ -19,7 +19,7 @@ export default defineConfig({
     { file: 'dist/index.cjs', format: 'cjs' },
     { file: 'dist/index.js', format: 'esm' },
   ],
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'xlsx'],
   plugins: [
     resolve(),
     commonjs(),
